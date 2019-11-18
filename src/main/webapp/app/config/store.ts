@@ -8,6 +8,8 @@ import notificationMiddleware from './notification-middleware';
 import loggerMiddleware from './logger-middleware';
 import { loadingBarMiddleware } from 'react-redux-loading-bar';
 
+import { composeWithDevTools } from 'redux-devtools-extension';
+
 const defaultMiddlewares = [
   thunkMiddleware,
   errorMiddleware,
@@ -23,6 +25,8 @@ const composedMiddlewares = middlewares =>
         DevTools.instrument()
       )
     : compose(applyMiddleware(...defaultMiddlewares, ...middlewares));
+
+//const initialize = (initialState?: IRootState, middlewares = []) => createStore(reducer, initialState, composedMiddlewares(middlewares), );
 
 const initialize = (initialState?: IRootState, middlewares = []) => createStore(reducer, initialState, composedMiddlewares(middlewares));
 

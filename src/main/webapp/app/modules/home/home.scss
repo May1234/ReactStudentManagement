@@ -1,6 +1,9 @@
 /* ==========================================================================
 Main page styles
 ========================================================================== */
+@import 'style.css';
+@import 'buttons.css';
+
 .hipster {
   display: inline-block;
   width: 100%;
@@ -22,4 +25,8 @@ Main page styles
 
 .courseInnerTable {
   padding-left: 5px;
+}
+
+.somespace {
+  margin-right: 10px;
 }

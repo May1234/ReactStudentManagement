@@ -8,11 +8,42 @@ import { Row, Col, Alert } from 'reactstrap';
 
 import { IRootState } from 'app/shared/reducers';
 import { getSession } from 'app/shared/reducers/authentication';
-import { clearCourses, getCourses } from 'app/shared/reducers/course';
+import { clearCourses, clearRegisteredCourses, getCourses, getRegisteredCourses, registerCourse } from 'app/shared/reducers/course';
+
+type MySate = {
+  c_name;
+  c_location;
+  c_content;
+  c_teacher;
+};
 
 export interface IHomeProp extends StateProps, DispatchProps {}
 
-export class Home extends React.Component<IHomeProp> {
+export class Home extends React.Component<IHomeProp, MyState> {
+  constructor(props) {
+    super(props);
+    this.state = { c_name: '', c_location: '', c_content: '', c_teacher: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    const value = event.target.value;
+
+    this.setState({
+      ...this.state,
+      [event.target.name]: value
+    });
+  }
+
+  handleSubmit(event) {
+    alert(
+      'A name was submitted: ' + this.state.c_name + ' ' + this.state.c_location + ' ' + this.state.c_content + ' ' + this.state.c_teacher
+    );
+    event.preventDefault();
+  }
+
   componentDidMount() {
     this.props.getSession();
   }
@@ -21,12 +52,27 @@ export class Home extends React.Component<IHomeProp> {
     this.props.getCourses();
   };
 
+  getRegisteredCourses = () => {
+    this.props.getRegisteredCourses();
+  };
+
   clearAllCourses = () => {
     this.props.clearCourses();
   };
 
+  clearRegisteredCourses = () => {
+    this.props.clearRegisteredCourses();
+  };
+  registerCourse = courseName => {
+    this.props.registerCourse(courseName);
+  };
+  addCourse = course => {
+    //this.props.addCourse(course);
+    console.log(course);
+  };
+
   render() {
-    let { account, courses, showCourse } = this.props;
+    let { account, courses, showCourse, reg_courses } = this.props;
     console.log(showCourse);
     return (
       <Row>
@@ -36,23 +82,114 @@ export class Home extends React.Component<IHomeProp> {
           {account && account.login ? (
             <div>
               <Alert color="success">You are logged in as user {account.login}.</Alert>
-              <button className="btn btn-primary" onClick={this.getAllCourses}>
+              <button className="button teal large" onClick={this.getAllCourses}>
                 显示所有课程
               </button>{' '}
-              <button onClick={this.clearAllCourses} className="btn btn-primary">
+              <button className="button teal large" onClick={this.clearAllCourses}>
                 清除
               </button>
-              {courses &&
-                courses.map(course => (
-                  <div className="courseOutterTable">
-                    <div className="courseInnerTable">{course.courseName}</div>
-                    <div>{course.courseLocation}</div>
-                    <div>{course.courseContent}</div>
-                    <div>{course.teacherName}</div>
-                    <button>注册课程</button>
-                    <button>删除课程</button>
+              <div className="container-fluid coursetable">
+                <div className="row">
+                  <div className="col-2 col-course col-header">Name</div>
+                  <div className="col-2 col-course col-header">Location</div>
+                  <div className="col-2 col-course col-header">Content</div>
+                  <div className="col-2 col-course col-header">Teacher</div>
+                  <div className="col-1 col-course col-header">Register</div>
+                  <div className="col-1 col-course col-header">Delete</div>
+                </div>
+
+                <div className="row">
+                  {courses &&
+                    courses.map(course => (
+                      <>
+                        <div className="col-8">
+                          <div className="row row-course">
+                            <div className="col-3 col-course">{course.courseName}</div>
+                            <div className="col-3 col-course">{course.courseLocation}</div>
+                            <div className="col-3 col-course">{course.courseContent}</div>
+                            <div className="col-3 col-course">{course.teacherName}</div>
+                          </div>
+                        </div>
+
+                        <div className="col-1">
+                          <button className="button teal small" onClick={() => this.registerCourse(course.courseName)}>
+                            注册课程
+                          </button>
+                        </div>
+                        <div className="col-1">
+                          <button className="button teal small">删除课程</button>
+                        </div>
+                      </>
+                    ))}
+                </div>
+              </div>
+              <hr />
+              <button className="button teal large" onClick={this.getRegisteredCourses}>
+                显示注册的课程
+              </button>{' '}
+              <button onClick={this.clearRegisteredCourses} className="button teal large">
+                清除
+              </button>
+              <div className="container-fluid coursetable">
+                <div className="row">
+                  <div className="col-2 col-course col-header">Name</div>
+                  <div className="col-2 col-course col-header">Location</div>
+                  <div className="col-2 col-course col-header">Content</div>
+                  <div className="col-2 col-course col-header">Teacher</div>
+                  <div className="col-1 col-course col-header">Register</div>
+                </div>
+                <div className="row">
+                  {reg_courses &&
+                    reg_courses.map(reg_course => (
+                      <>
+                        <div className="col-8">
+                          <div className="row row-course">
+                            <div className="col-3 col-course">{reg_course.course.courseName}</div>
+                            <div className="col-3 col-course">{reg_course.course.courseLocation}</div>
+                            <div className="col-3 col-course">{reg_course.course.courseContent}</div>
+                            <div className="col-3 col-course">{reg_course.course.teacherName}</div>
+                          </div>
+                        </div>
+
+                        <div className="col-1">
+                          <button className="button teal small" onClick={() => this.registerCourse(reg_course.course.courseName)}>
+                            取消注册
+                          </button>
+                        </div>
+                      </>
+                    ))}
+                </div>
+                <hr />
+
+                <form onSubmit={this.handleSubmit}>
+                  <div>
+                    <span>
+                      课程名称&nbsp;
+                      <input type="text" value={this.state.c_name} name="c_name" onChange={this.handleChange} />
+                    </span>
                   </div>
-                ))}
+                  <div>
+                    <span>
+                      课程地点&nbsp;
+                      <input type="text" value={this.state.c_location} name="c_location" onChange={this.handleChange} />
+                    </span>
+                  </div>
+                  <div>
+                    <span>
+                      课程内容&nbsp;
+                      <input type="text" value={this.state.c_content} name="c_content" onChange={this.handleChange} />
+                    </span>
+                  </div>
+                  <div>
+                    <span>
+                      课程老师&nbsp;
+                      <input type="text" value={this.state.c_teacher} name="c_teacher" onChange={this.handleChange} />
+                    </span>
+                  </div>
+                  <br />
+                  <input type="submit" value="创建" />
+                </form>
+              </div>
             </div>
           ) : (
             <div>
@@ -85,10 +222,11 @@ const mapStateToProps = storeState => ({
   account: storeState.authentication.account,
   isAuthenticated: storeState.authentication.isAuthenticated,
   courses: storeState.course.courses,
+  reg_courses: storeState.course.reg_courses,
   showCourse: storeState.course.showCourse
 });
 
-const mapDispatchToProps = { getSession, getCourses, clearCourses };
+const mapDispatchToProps = { getSession, clearCourses, getCourses, getRegisteredCourses, clearRegisteredCourses, registerCourse };
 
 type StateProps = ReturnType<typeof mapStateToProps>;
 type DispatchProps = typeof mapDispatchToProps;

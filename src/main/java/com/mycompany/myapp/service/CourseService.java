@@ -120,4 +120,12 @@ public class CourseService {
         existingCourse.setTeacherId(course.getTeacherId());
 
     }
+
+
+    /*from May*/
+    public List<UserCourse> findRegisteredCoursesDtoFromDB(){
+        //  return userCourseRepository.findRegisteredCoursesDto();
+        return userCourseRepository.findAll();
+    }
+
 }

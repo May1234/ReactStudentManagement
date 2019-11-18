@@ -1,5 +1,6 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.UserCourse;
 import com.mycompany.myapp.domain.dto.CourseDto;
 import com.mycompany.myapp.domain.dto.CourseWithTNDto;
 import com.mycompany.myapp.service.CourseService;
@@ -91,4 +92,13 @@ public class CourseController {
             return HttpStatus.BAD_REQUEST;
         }
     }
+
+    //*************************************************************May***************************//
+    @GetMapping(path = "/api/course/findRegisteredCourses", produces = "application/json")
+    public HttpEntity<List<UserCourse>> findRegisteredCoursesDto(){
+        List<UserCourse> allCourses = courseService.findRegisteredCoursesDtoFromDB();
+
+        return new ResponseEntity<>(allCourses, HttpStatus.OK);
+    }
+
 }
