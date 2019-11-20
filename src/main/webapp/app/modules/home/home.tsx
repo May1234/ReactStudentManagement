@@ -8,7 +8,16 @@ import { Row, Col, Alert } from 'reactstrap';
 
 import { IRootState } from 'app/shared/reducers';
 import { getSession } from 'app/shared/reducers/authentication';
-import { clearCourses, clearRegisteredCourses, getCourses, getRegisteredCourses, registerCourse } from 'app/shared/reducers/course';
+import {
+  clearCourses,
+  clearRegisteredCourses,
+  getCourses,
+  getRegisteredCourses,
+  registerCourse,
+  addCourse,
+  deleteCourse,
+  dropCourse
+} from 'app/shared/reducers/course';
 
 type MySate = {
   c_name;
@@ -42,6 +51,7 @@ export class Home extends React.Component<IHomeProp, MyState> {
       'A name was submitted: ' + this.state.c_name + ' ' + this.state.c_location + ' ' + this.state.c_content + ' ' + this.state.c_teacher
     );
     event.preventDefault();
+    this.props.addCourse(this.state);
   }
 
   componentDidMount() {
@@ -66,14 +76,17 @@ export class Home extends React.Component<IHomeProp, MyState> {
   registerCourse = courseName => {
     this.props.registerCourse(courseName);
   };
-  addCourse = course => {
-    //this.props.addCourse(course);
-    console.log(course);
+  deleteCourse = courseName => {
+    this.props.deleteCourse(courseName);
+  };
+
+  dropCourse = courseId => {
+    this.props.dropCourse(courseId);
   };
 
   render() {
-    let { account, courses, showCourse, reg_courses } = this.props;
-    console.log(showCourse);
+    let { account, courses, showCourse, reg_courses, status } = this.props;
+    console.log(status);
     return (
       <Row>
         <Col md="9">
@@ -117,7 +130,9 @@ export class Home extends React.Component<IHomeProp, MyState> {
                           </button>
                         </div>
                         <div className="col-1">
-                          <button className="button teal small">删除课程</button>
+                          <button className="button teal small" onClick={() => this.deleteCourse(course.courseName)}>
+                            删除课程
+                          </button>
                         </div>
                       </>
                     ))}
@@ -152,7 +167,7 @@ export class Home extends React.Component<IHomeProp, MyState> {
                         </div>
 
                         <div className="col-1">
-                          <button className="button teal small" onClick={() => this.registerCourse(reg_course.course.courseName)}>
+                          <button className="button teal small" onClick={() => this.dropCourse(reg_course.id)}>
                             取消注册
                           </button>
                         </div>
@@ -223,10 +238,21 @@ const mapStateToProps = storeState => ({
   isAuthenticated: storeState.authentication.isAuthenticated,
   courses: storeState.course.courses,
   reg_courses: storeState.course.reg_courses,
+  status: storeState.course.status,
   showCourse: storeState.course.showCourse
 });
 
-const mapDispatchToProps = { getSession, clearCourses, getCourses, getRegisteredCourses, clearRegisteredCourses, registerCourse };
+const mapDispatchToProps = {
+  getSession,
+  clearCourses,
+  getCourses,
+  getRegisteredCourses,
+  clearRegisteredCourses,
+  registerCourse,
+  addCourse,
+  deleteCourse,
+  dropCourse
+};
 
 type StateProps = ReturnType<typeof mapStateToProps>;
 type DispatchProps = typeof mapDispatchToProps;

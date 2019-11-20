@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { SUCCESS } from 'app/shared/reducers/action-type.util';
+import { log } from 'react-jhipster';
 
 export const ACTION_TYPES = {
   GET_COURSES: 'course/GET_COURSES',
@@ -8,13 +9,15 @@ export const ACTION_TYPES = {
   REGISTER_COURSE: 'course/REGISTER_COURSE',
   GET_REGISTERED_COURSES: 'course/REGISTERED_COURSES',
   CLEAR_REGISTERED_COURSES: 'course/CLEAR_REGISTERED_COURSES',
-  ADD_COURSE: 'course/ADD_COURSE'
+  ADD_COURSE: 'course/ADD_COURSE',
+  DELETE_COURSE: 'course/DELETE_COURSE',
+  DROP_COURSE: 'course/DROP_COURSE'
 };
 
 const initialState = {
   courses: [],
   reg_courses: [],
-  course1: { courseName: '' }
+  status: ''
 };
 
 export type ApplicationCourseState = Readonly<typeof initialState>;
@@ -33,7 +36,7 @@ export default (state: ApplicationCourseState = initialState, action): Applicati
         ...newState
       };
     case ACTION_TYPES.CLEAR_REGISTERED_COURSES:
-      let newState = { ...state };
+      newState = { ...state };
       delete newState.reg_courses;
       return {
         ...newState
@@ -42,6 +45,15 @@ export default (state: ApplicationCourseState = initialState, action): Applicati
       return {
         ...state,
         reg_courses: action.payload.data
+      };
+
+    case SUCCESS(ACTION_TYPES.ADD_COURSE):
+      return state;
+
+    case SUCCESS(ACTION_TYPES.DELETE_COURSE):
+      return {
+        ...state,
+        status: action.payload.data
       };
 
     default:
@@ -75,4 +87,32 @@ export const registerCourse = courseName => dispatch =>
   dispatch({
     type: ACTION_TYPES.REGISTER_COURSE,
     payload: axios.post('api/course/registerCourse/' + courseName)
+  });
+
+export const addCourse = course => dispatch =>
+  dispatch({
+    type: ACTION_TYPES.ADD_COURSE,
+    payload: axios.post('api/course/addCourse/', {
+      courseName: course.c_name,
+      courseContent: course.c_content,
+      courseLocation: course.c_location,
+      courseTeacher: course.c_name
+    })
+  });
+
+export const deleteCourse = courseName => dispatch =>
+  dispatch({
+    type: ACTION_TYPES.DELETE_COURSE,
+    payload: axios.delete('api/course/deleteCourse/' + courseName)
+  }).then(() => dispatch =>
+    dispatch({
+      type: ACTION_TYPES.GET_COURSES,
+      payload: axios.get('api/course/findAllCourses')
+    })
+  );
+
+export const dropCourse = courseId => dispatch =>
+  dispatch({
+    type: ACTION_TYPES.DROP_COURSE,
+    payload: axios.delete('api/course/dropCourse/' + courseId)
   });
